@@ -28,11 +28,8 @@
 "taskbar" = "Atrás da barra de tarefas";
 "screenshots" = "Mostrar em capturas de tela";
 "performance" = "Desempenho máximo";
-"sound" = "Som";
 "sound.generator" = "Gerador";
 "login" = "Abrir ao iniciar sessão";
-"updates" = "Procurar atualizações…";
-"support" = "Apoiar o Snowhush";
 "quit" = "Sair";
 
 "clear.snow" = "Limpar a neve";
@@ -65,3 +62,35 @@
 "setup.open" = "Abrir o Snowhush";
 "setup.failed" = "Não foi possível instalar: {error}.";
 "setup.retry" = "Tentar de novo";
+
+/* Sound */
+"sound" = "Som";
+"sound.ambient" = "Som ambiente";
+"sound.volume" = "Volume";
+"sound.music" = "Sua música";
+"sound.music.choose" = "Escolher pasta de música…";
+"sound.music.folder" = "Música:";
+"sound.music.stop" = "Parar música";
+"sound.music.next" = "Próxima faixa";
+"sound.music.empty" = "Essa pasta não tem músicas que o Snowhush possa tocar.";
+"sound.music.prompt" = "Escolha uma pasta de música para tocar baixinho sob o som ambiente.";
+"sound.custom" = "Usar seus próprios sons…";
+"sound.credits" = "Créditos de som";
+
+/* Presets and sleep timer */
+"presets" = "Predefinições";
+"preset.winter" = "Inverno profundo";
+"preset.autumn" = "Fim de tarde de outono";
+"preset.rain" = "Chuva aconchegante";
+"preset.spring" = "Manhã de primavera";
+"preset.focus" = "Foco";
+"preset.save" = "Salvar atual como predefinição…";
+"preset.save.title" = "Salvar predefinição";
+"preset.save.prompt" = "O modo, a intensidade e o volume são salvos; a predefinição liga o som.";
+"preset.name" = "Nome da predefinição";
+"preset.delete" = "Apagar “%@”";
+"save" = "Salvar";
+"cancel" = "Cancelar";
+"sleep" = "Timer de sono";
+"sleep.off" = "Desligado";
+"sleep.left" = "Faltam %@";

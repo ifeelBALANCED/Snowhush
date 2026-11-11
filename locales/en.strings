@@ -32,11 +32,8 @@
 "taskbar" = "Behind Taskbar";
 "screenshots" = "Show in Screenshots";
 "performance" = "Max Performance";
-"sound" = "Sound";
 "sound.generator" = "Generator";
 "login" = "Open at Login";
-"updates" = "Check for Updates…";
-"support" = "Support Snowhush";
 "quit" = "Quit";
 
 /* Clear Snow, for what lies about: rain never does. */
@@ -73,3 +70,35 @@
 "setup.open" = "Open Snowhush";
 "setup.failed" = "Couldn't install: {error}.";
 "setup.retry" = "Try Again";
+
+/* Sound */
+"sound" = "Sound";
+"sound.ambient" = "Ambient Sound";
+"sound.volume" = "Volume";
+"sound.music" = "Your Music";
+"sound.music.choose" = "Choose Music Folder…";
+"sound.music.folder" = "Music:";
+"sound.music.stop" = "Stop Music";
+"sound.music.next" = "Next Track";
+"sound.music.empty" = "That folder has no music Snowhush can play.";
+"sound.music.prompt" = "Pick a folder of music to play quietly under the sound of what falls.";
+"sound.custom" = "Use Your Own Sounds…";
+"sound.credits" = "Sound Credits";
+
+/* Presets and sleep timer */
+"presets" = "Presets";
+"preset.winter" = "Deep Winter";
+"preset.autumn" = "Autumn Evening";
+"preset.rain" = "Cozy Rain";
+"preset.spring" = "Spring Morning";
+"preset.focus" = "Focus";
+"preset.save" = "Save Current as Preset…";
+"preset.save.title" = "Save Preset";
+"preset.save.prompt" = "What falls, its intensity and the sound volume are saved; the preset turns sound on.";
+"preset.name" = "Preset name";
+"preset.delete" = "Delete “%@”";
+"save" = "Save";
+"cancel" = "Cancel";
+"sleep" = "Sleep Timer";
+"sleep.off" = "Off";
+"sleep.left" = "%@ left";

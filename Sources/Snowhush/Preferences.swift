@@ -41,6 +41,10 @@ enum Preferences {
     private static let fallingOpacityKey = "fallingOpacity"
     private static let generatorSoundKey = "generatorSound"
     private static let generatorVolumeKey = "generatorVolume"
+    private static let soundKey = "soundOn"
+    private static let soundVolumeKey = "soundVolume"
+    private static let musicVolumeKey = "musicVolume"
+    private static let musicFolderKey = "musicFolder"
 
     static func registerDefaults() {
         let calm = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
@@ -62,6 +66,9 @@ enum Preferences {
             fallingOpacityKey: 1.0,
             generatorSoundKey: false,
             generatorVolumeKey: 0.5,
+            soundKey: false,
+            soundVolumeKey: 0.7,
+            musicVolumeKey: 0.5,
         ])
         if defaults.object(forKey: intensityKey) == nil, let stop = defaults.object(forKey: snowfallKey) as? Int {
             defaults.set([0, 0.25, 0.5, 0.75, 0.5][min(max(stop, 0), 4)], forKey: intensityKey)
@@ -197,5 +204,28 @@ enum Preferences {
     static var generatorVolume: Double {
         get { min(max(defaults.double(forKey: generatorVolumeKey), 0), 1) }
         set { defaults.set(newValue, forKey: generatorVolumeKey) }
+    }
+
+    /// The sound of what falls, off until turned on: an app that starts making noise unasked is one that gets quit.
+    static var sound: Bool {
+        get { defaults.bool(forKey: soundKey) }
+        set { defaults.set(newValue, forKey: soundKey) }
+    }
+
+    static var soundVolume: Double {
+        get { min(max(defaults.double(forKey: soundVolumeKey), 0), 1) }
+        set { defaults.set(newValue, forKey: soundVolumeKey) }
+    }
+
+    /// How loud the person's own music plays under the sound, as a share of its volume.
+    static var musicVolume: Double {
+        get { min(max(defaults.double(forKey: musicVolumeKey), 0), 1) }
+        set { defaults.set(newValue, forKey: musicVolumeKey) }
+    }
+
+    /// The folder of the person's own music, nil for none.
+    static var musicFolder: URL? {
+        get { defaults.string(forKey: musicFolderKey).map { URL(fileURLWithPath: $0, isDirectory: true) } }
+        set { defaults.set(newValue?.path, forKey: musicFolderKey) }
     }
 }

@@ -35,7 +35,7 @@
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
 	<key>SUEnableAutomaticChecks</key>
-	<true/>
+	<false/>
 	<key>SUFeedURL</key>
 	<string>https://github.com/mbezruchko/Snowhush/releases/latest/download/appcast.xml</string>
 	<key>SUPublicEDKey</key>

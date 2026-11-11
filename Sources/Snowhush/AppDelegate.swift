@@ -46,6 +46,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
     private var welcome: WelcomeController?
     private let power = PowerMonitor()
     private var halloweenTimer: Timer?
+    private let ambience = Ambience()
+    private var soundItem: NSMenuItem!
+    private let soundSlider = MenuSlider(range: 0...1)
+    private let musicSlider = MenuSlider(range: 0...1)
+    private var musicChooseItem: NSMenuItem!
+    private var musicSliderItem: NSMenuItem!
+    private var musicStopItem: NSMenuItem!
+    private var trackItem: NSMenuItem!
+    private var nextTrackItem: NSMenuItem!
+    private let presetsMenu = NSMenu()
+    private let sleepMenu = NSMenu()
+    private var sleepItem: NSMenuItem!
+    private var sleepTimer: Timer?
+    private var sleepEnds: Date?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if AppMover.moveIfNeeded() {
@@ -76,6 +90,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
         refreshHalloween()
         halloweenTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in self?.refreshHalloween() }
         observeSystem()
+        ambience.volume = Float(Preferences.soundVolume)
+        ambience.musicVolume = Float(Preferences.musicVolume)
+        ambience.musicFolder = Preferences.musicFolder
+        ambience.on = Preferences.sound
+        updateSound()
         Marquee.enabled = Preferences.deepInteraction
         screenshots.stepAside = { [weak self] aside in self?.screens.forEach { $0.stepAside(aside) } }
         screenshots.start()
@@ -197,7 +216,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
         modes.addItem(.separator())
         halloweenItem = add(tr("halloween"), #selector(toggleHalloween), to: modes)
         menu.addItem(withTitle: tr("mode"), action: nil, keyEquivalent: "").submenu = modes
+        presetsMenu.autoenablesItems = false
+        presetsMenu.delegate = self
+        menu.addItem(withTitle: tr("presets"), action: nil, keyEquivalent: "").submenu = presetsMenu
         clearItem = add(tr("clear.snow"), #selector(clearSnow), to: menu)
+        menu.addItem(withTitle: tr("sound"), action: nil, keyEquivalent: "").submenu = makeSoundMenu()
         menu.addItem(.separator())
         let settings = NSMenu()
         settings.autoenablesItems = false
@@ -211,44 +234,60 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
         screenshotsItem = toggle(tr("screenshots"), #selector(toggleScreenshots), to: settings)
         maxPerformanceItem = toggle(tr("performance"), #selector(toggleMaxPerformance), to: settings)
         settings.addItem(.separator())
-        settings.addItem(.sectionHeader(title: tr("sound")))
-        generatorItem = toggle(tr("sound.generator"), #selector(toggleGeneratorSound), to: settings)
-        volumeSlider.changed = { [unowned self] volume in
-            Preferences.generatorVolume = volume
-            generator.volume = volume
-        }
-        volumeItem = NSMenuItem()
-        volumeItem.view = volumeSlider
-        settings.addItem(volumeItem)
-        settings.addItem(.separator())
         settings.addItem(.sectionHeader(title: tr("general")))
         loginItem = toggle(tr("login"), #selector(toggleOpenAtLogin), to: settings)
-        let updates = settings.addItem(withTitle: tr("updates"), action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: "")
-        updates.target = updater
         menu.addItem(withTitle: tr("settings"), action: nil, keyEquivalent: "").submenu = settings
-        add(tr("support"), #selector(openSponsors), to: menu).attributedTitle = Self.supportTitle
         menu.addItem(withTitle: tr("quit"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
 
         item.menu = menu
         return item
     }
 
-    /// The site's sponsor heart, in its colour, ahead of the title: set as the item's image, the status menu doesn't
-    /// show it.
-    private static let supportTitle: NSAttributedString = {
-        let font = NSFont.menuFont(ofSize: 0)
-        let title = NSMutableAttributedString(string: tr("support"), attributes: [.font: font])
-        guard let heart = NSImage(systemSymbolName: "heart.fill", accessibilityDescription: nil)?
-            .withSymbolConfiguration(.init(pointSize: font.pointSize * 0.85, weight: .regular).applying(.init(paletteColors: [NSColor(srgbRed: 0.92, green: 0.51, blue: 0.51, alpha: 1)])))
-        else { return title }
-        heart.isTemplate = false
-        let attachment = NSTextAttachment()
-        attachment.image = heart
-        attachment.bounds = CGRect(x: 0, y: (font.capHeight - heart.size.height) / 2, width: heart.size.width, height: heart.size.height)
-        title.insert(NSAttributedString(string: "  ", attributes: [.font: font]), at: 0)
-        title.insert(NSAttributedString(attachment: attachment), at: 0)
-        return title
-    }()
+    private func makeSoundMenu() -> NSMenu {
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+        soundItem = toggle(tr("sound.ambient"), #selector(toggleSound), to: menu)
+        menu.addItem(.sectionHeader(title: tr("sound.volume")))
+        soundSlider.changed = { [unowned self] volume in
+            Preferences.soundVolume = volume
+            ambience.volume = Float(volume)
+        }
+        let soundSliderItem = NSMenuItem()
+        soundSliderItem.view = soundSlider
+        menu.addItem(soundSliderItem)
+        menu.addItem(.separator())
+        generatorItem = toggle(tr("sound.generator"), #selector(toggleGeneratorSound), to: menu)
+        volumeSlider.changed = { [unowned self] volume in
+            Preferences.generatorVolume = volume
+            generator.volume = volume
+        }
+        volumeItem = NSMenuItem()
+        volumeItem.view = volumeSlider
+        menu.addItem(volumeItem)
+        menu.addItem(.separator())
+        menu.addItem(.sectionHeader(title: tr("sound.music")))
+        musicChooseItem = add(tr("sound.music.choose"), #selector(chooseMusicFolder), to: menu)
+        musicSlider.changed = { [unowned self] volume in
+            Preferences.musicVolume = volume
+            ambience.musicVolume = Float(volume)
+        }
+        musicSliderItem = NSMenuItem()
+        musicSliderItem.view = musicSlider
+        menu.addItem(musicSliderItem)
+        trackItem = menu.addItem(withTitle: "", action: nil, keyEquivalent: "")
+        trackItem.isEnabled = false
+        nextTrackItem = add(tr("sound.music.next"), #selector(nextTrack), to: menu)
+        musicStopItem = add(tr("sound.music.stop"), #selector(stopMusic), to: menu)
+        ambience.trackChanged = { [weak self] in self?.refreshTrack() }
+        menu.addItem(.separator())
+        sleepMenu.autoenablesItems = false
+        sleepMenu.delegate = self
+        sleepItem = menu.addItem(withTitle: tr("sleep"), action: nil, keyEquivalent: "")
+        sleepItem.submenu = sleepMenu
+        add(tr("sound.custom"), #selector(openCustomSounds), to: menu)
+        add(tr("sound.credits"), #selector(openSoundCredits), to: menu)
+        return menu
+    }
 
     @discardableResult
     private func add(_ title: String, _ action: Selector, to menu: NSMenu) -> NSMenuItem {
@@ -266,6 +305,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
+        if menu === presetsMenu { return fillPresets() }
+        if menu === sleepMenu { return fillSleep() }
         intensitySlider.value = Preferences.intensity
         opacitySlider.value = Preferences.fallingOpacity
         opacityRow.summary = MenuSlider.percent(Preferences.fallingOpacity)
@@ -306,12 +347,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
         volumeSlider.value = Preferences.generatorVolume
         volumeItem.isHidden = !Preferences.generatorSound
         loginItem.state = SMAppService.mainApp.status == .enabled ? .on : .off
+        soundItem.state = Preferences.sound ? .on : .off
+        soundSlider.value = Preferences.soundVolume
+        musicSlider.value = Preferences.musicVolume
+        let folder = Preferences.musicFolder
+        musicChooseItem.title = folder.map { "\(tr("sound.music.folder")) \($0.lastPathComponent)" } ?? tr("sound.music.choose")
+        musicSliderItem.isHidden = folder == nil
+        musicStopItem.isHidden = folder == nil
+        refreshTrack()
+        sleepItem.title = sleepEnds.map { "\(tr("sleep")) · \(Self.minutes(until: $0))" } ?? tr("sleep")
     }
 
     private func select(intensity: Double) {
         Preferences.intensity = intensity
         for snow in screens { snow.simulation.intensity = Float(intensity) }
         updateStatusIcon()
+        updateSound()
     }
 
     private func toggle(_ surface: Surfaces) {
@@ -364,10 +415,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
         }
     }
 
-    @objc private func openSponsors() {
-        NSWorkspace.shared.open(URL(string: "https://github.com/sponsors/mbezruchko")!)
-    }
-
     @objc private func toggleOpenAtLogin() {
         let service = SMAppService.mainApp
         do {
@@ -413,6 +460,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
         let direction = screens.first?.simulation.breezeDirection ?? -1
         let calm = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         for snow in screens { snow.simulation.switchMode(to: Preferences.modes, direction: direction, calm: calm) }
+        updateSound()
     }
 
     @objc private func toggleGeneratorSound() {
@@ -462,6 +510,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
         halloween.toggle()
         updateStatusIcon()
         for snow in screens { snow.halloween = halloween }
+        updateSound()
     }
 
     // MARK: - System
@@ -503,5 +552,206 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUSta
             snow.occlusionChanged()
             snow.setActive(awake && !snow.givesWay && (snow.window.occlusionState.contains(.visible) || snow.fading), asleep: !awake)
         }
+        updateSound()
+    }
+
+    // MARK: - Presets
+
+    private func fillPresets() {
+        presetsMenu.removeAllItems()
+        let modes = Preferences.modes, intensity = Preferences.intensity, volume = Preferences.soundVolume, sound = Preferences.sound
+        func item(_ preset: Preset, _ tag: Int) {
+            let item = add(preset.name, #selector(applyPreset), to: presetsMenu)
+            item.tag = tag
+            item.state = preset.matches(modes: modes, intensity: intensity, volume: volume, sound: sound) ? .on : .off
+        }
+        for (index, entry) in Preset.builtIn.enumerated() { item(entry.preset, index) }
+        let own = Preferences.presets
+        if !own.isEmpty {
+            presetsMenu.addItem(.separator())
+            for (index, preset) in own.enumerated() {
+                item(preset, 1000 + index)
+                // Held Option turns each of the person's presets into its removal, as Finder's menus do.
+                let remove = add(String(format: tr("preset.delete"), preset.name), #selector(deletePreset), to: presetsMenu)
+                remove.tag = 1000 + index
+                remove.keyEquivalentModifierMask = .option
+                remove.isAlternate = true
+            }
+        }
+        presetsMenu.addItem(.separator())
+        add(tr("preset.save"), #selector(savePreset), to: presetsMenu)
+    }
+
+    private func preset(tagged tag: Int) -> Preset? {
+        tag >= 1000 ? Preferences.presets[safe: tag - 1000] : Preset.builtIn[safe: tag]?.preset
+    }
+
+    @objc private func applyPreset(_ sender: NSMenuItem) {
+        guard let preset = preset(tagged: sender.tag), !preset.modes.isEmpty else { return }
+        Preferences.mixed = preset.modes.count > 1
+        if Preferences.mixed { Preferences.mix = Array(preset.modes.prefix(2)) }
+        Preferences.mode = preset.modes.last!
+        switchModes()
+        select(intensity: preset.intensity)
+        Preferences.soundVolume = preset.volume
+        ambience.volume = Float(preset.volume)
+        if !Preferences.sound { toggleSound() }
+    }
+
+    @objc private func savePreset() {
+        let alert = NSAlert()
+        alert.messageText = tr("preset.save.title")
+        alert.informativeText = tr("preset.save.prompt")
+        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 240, height: 24))
+        field.placeholderString = tr("preset.name")
+        alert.accessoryView = field
+        alert.addButton(withTitle: tr("save"))
+        alert.addButton(withTitle: tr("cancel"))
+        alert.window.initialFirstResponder = field
+        NSApp.activate(ignoringOtherApps: true)
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        let name = field.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        let preset = Preset(name: name, modes: Preferences.modes, intensity: Preferences.intensity, volume: Preferences.soundVolume)
+        var own = Preferences.presets.filter { $0.name != name }
+        own.append(preset)
+        Preferences.presets = own
+    }
+
+    @objc private func deletePreset(_ sender: NSMenuItem) {
+        var own = Preferences.presets
+        guard own.indices.contains(sender.tag - 1000) else { return }
+        own.remove(at: sender.tag - 1000)
+        Preferences.presets = own
+    }
+
+    // MARK: - Sleep timer
+
+    private static let sleepChoices: [TimeInterval] = [15, 30, 60, 90, 120].map { $0 * 60 }
+
+    private func fillSleep() {
+        sleepMenu.removeAllItems()
+        let off = add(tr("sleep.off"), #selector(chooseSleep), to: sleepMenu)
+        off.tag = 0
+        off.state = sleepEnds == nil ? .on : .off
+        sleepMenu.addItem(.separator())
+        let format = DateComponentsFormatter()
+        format.allowedUnits = [.hour, .minute]
+        format.unitsStyle = .short
+        for seconds in Self.sleepChoices {
+            let item = add(format.string(from: seconds) ?? "", #selector(chooseSleep), to: sleepMenu)
+            item.tag = Int(seconds)
+        }
+        if let ends = sleepEnds {
+            sleepMenu.addItem(.separator())
+            let left = sleepMenu.addItem(withTitle: String(format: tr("sleep.left"), Self.minutes(until: ends)), action: nil, keyEquivalent: "")
+            left.isEnabled = false
+        }
+    }
+
+    private static func minutes(until date: Date) -> String {
+        let format = DateComponentsFormatter()
+        format.allowedUnits = [.hour, .minute]
+        format.unitsStyle = .short
+        return format.string(from: max(60, date.timeIntervalSinceNow.rounded(.up))) ?? ""
+    }
+
+    private func cancelSleep() {
+        sleepTimer?.invalidate()
+        sleepTimer = nil
+        sleepEnds = nil
+    }
+
+    @objc private func chooseSleep(_ sender: NSMenuItem) {
+        cancelSleep()
+        guard sender.tag > 0 else { return }
+        if !Preferences.sound { toggleSound() }
+        let seconds = TimeInterval(sender.tag)
+        sleepEnds = Date().addingTimeInterval(seconds)
+        let timer = Timer(timeInterval: seconds, repeats: false) { [weak self] _ in self?.fallAsleep() }
+        timer.tolerance = 5
+        // Common modes, so it still ends on time while a menu is open.
+        RunLoop.main.add(timer, forMode: .common)
+        sleepTimer = timer
+    }
+
+    /// The sound, music too, fades out over half a minute and stays off; the snow keeps falling.
+    private func fallAsleep() {
+        sleepTimer = nil
+        sleepEnds = nil
+        guard Preferences.sound else { return }
+        Preferences.sound = false
+        ambience.fadeOut(over: 30)
+        updateSound()
+    }
+
+    // MARK: - Sound
+
+    /// Heard while the snow can be seen somewhere: not with the screens asleep or locked, nor while full-screen apps
+    /// cover every display it falls on.
+    private func updateSound() {
+        guard ambience.on else { return ambience.update(modes: [], halloween: false, intensity: 0, audible: false) }
+        let awake = !screensAsleep && !screenLocked && !sessionInactive
+        ambience.update(
+            modes: Preferences.modes,
+            halloween: halloween,
+            intensity: Preferences.intensity,
+            audible: awake && screens.contains { !$0.givesWay }
+        )
+    }
+
+    @objc private func toggleSound() {
+        Preferences.sound.toggle()
+        if !Preferences.sound { cancelSleep() }
+        ambience.on = Preferences.sound
+        updateSound()
+    }
+
+    @objc private func chooseMusicFolder() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.directoryURL = Preferences.musicFolder ?? FileManager.default.urls(for: .musicDirectory, in: .userDomainMask).first
+        panel.message = tr("sound.music.prompt")
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK, let folder = panel.url else { return }
+        guard MusicPlayer.hasMusic(in: folder) else {
+            let alert = NSAlert()
+            alert.messageText = tr("sound.music.empty")
+            alert.informativeText = folder.lastPathComponent
+            alert.runModal()
+            return
+        }
+        Preferences.musicFolder = folder
+        ambience.musicFolder = folder
+        if !Preferences.sound { toggleSound() }
+    }
+
+    /// The track playing, by its file name, under the folder; hidden with no music.
+    private func refreshTrack() {
+        guard let trackItem else { return }
+        let track = ambience.track
+        trackItem.title = track.map { "♪ " + $0.deletingPathExtension().lastPathComponent } ?? ""
+        trackItem.isHidden = track == nil
+        nextTrackItem.isHidden = track == nil
+    }
+
+    @objc private func nextTrack() {
+        ambience.skipTrack()
+    }
+
+    @objc private func stopMusic() {
+        Preferences.musicFolder = nil
+        ambience.musicFolder = nil
+    }
+
+    @objc private func openCustomSounds() {
+        NSWorkspace.shared.open(Ambience.prepareCustomFolder())
+    }
+
+    @objc private func openSoundCredits() {
+        guard let credits = Bundle.main.url(forResource: "CREDITS", withExtension: "txt", subdirectory: "Sounds") else { return }
+        NSWorkspace.shared.open(credits)
     }
 }

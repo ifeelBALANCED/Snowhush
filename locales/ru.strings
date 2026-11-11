@@ -28,11 +28,8 @@
 "taskbar" = "За панелью задач";
 "screenshots" = "Показывать на снимках экрана";
 "performance" = "Максимальная производительность";
-"sound" = "Звук";
 "sound.generator" = "Генератор";
 "login" = "Открывать при входе";
-"updates" = "Проверить обновления…";
-"support" = "Поддержать Snowhush";
 "quit" = "Выйти";
 
 "clear.snow" = "Убрать снег";
@@ -65,3 +62,35 @@
 "setup.open" = "Открыть Snowhush";
 "setup.failed" = "Не удалось установить: {error}.";
 "setup.retry" = "Повторить";
+
+/* Sound */
+"sound" = "Звук";
+"sound.ambient" = "Звуки природы";
+"sound.volume" = "Громкость";
+"sound.music" = "Ваша музыка";
+"sound.music.choose" = "Выбрать папку с музыкой…";
+"sound.music.folder" = "Музыка:";
+"sound.music.stop" = "Остановить музыку";
+"sound.music.next" = "Следующий трек";
+"sound.music.empty" = "В этой папке нет музыки, которую может воспроизвести Snowhush.";
+"sound.music.prompt" = "Выберите папку с музыкой, которая будет тихо играть под звуки природы.";
+"sound.custom" = "Свои звуки…";
+"sound.credits" = "Авторы звуков";
+
+/* Presets and sleep timer */
+"presets" = "Пресеты";
+"preset.winter" = "Глубокая зима";
+"preset.autumn" = "Осенний вечер";
+"preset.rain" = "Уютный дождь";
+"preset.spring" = "Весеннее утро";
+"preset.focus" = "Фокус";
+"preset.save" = "Сохранить текущее как пресет…";
+"preset.save.title" = "Сохранить пресет";
+"preset.save.prompt" = "Сохранятся режим, интенсивность и громкость; пресет включает звук.";
+"preset.name" = "Название пресета";
+"preset.delete" = "Удалить «%@»";
+"save" = "Сохранить";
+"cancel" = "Отменить";
+"sleep" = "Таймер сна";
+"sleep.off" = "Выключен";
+"sleep.left" = "Осталось %@";

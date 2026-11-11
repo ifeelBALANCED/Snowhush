@@ -28,11 +28,8 @@
 "taskbar" = "タスクバーの後ろ";
 "screenshots" = "スクリーンショットに表示";
 "performance" = "最大パフォーマンス";
-"sound" = "サウンド";
 "sound.generator" = "発電機";
 "login" = "ログイン時に開く";
-"updates" = "アップデートを確認…";
-"support" = "Snowhushを支援";
 "quit" = "終了";
 
 "clear.snow" = "雪を消す";
@@ -65,3 +62,35 @@
 "setup.open" = "Snowhushを開く";
 "setup.failed" = "インストールできませんでした：{error}。";
 "setup.retry" = "再試行";
+
+/* Sound */
+"sound" = "サウンド";
+"sound.ambient" = "環境音";
+"sound.volume" = "音量";
+"sound.music" = "あなたの音楽";
+"sound.music.choose" = "音楽フォルダを選択…";
+"sound.music.folder" = "音楽:";
+"sound.music.stop" = "音楽を停止";
+"sound.music.next" = "次のトラック";
+"sound.music.empty" = "このフォルダには Snowhush で再生できる音楽がありません。";
+"sound.music.prompt" = "環境音の下で静かに流す音楽フォルダを選んでください。";
+"sound.custom" = "自分のサウンドを使う…";
+"sound.credits" = "サウンドのクレジット";
+
+/* Presets and sleep timer */
+"presets" = "プリセット";
+"preset.winter" = "深い冬";
+"preset.autumn" = "秋の夕暮れ";
+"preset.rain" = "心地よい雨";
+"preset.spring" = "春の朝";
+"preset.focus" = "集中";
+"preset.save" = "現在の設定をプリセットとして保存…";
+"preset.save.title" = "プリセットを保存";
+"preset.save.prompt" = "モード、強さ、音量が保存されます。プリセットを選ぶとサウンドがオンになります。";
+"preset.name" = "プリセット名";
+"preset.delete" = "“%@”を削除";
+"save" = "保存";
+"cancel" = "キャンセル";
+"sleep" = "スリープタイマー";
+"sleep.off" = "オフ";
+"sleep.left" = "残り %@";
