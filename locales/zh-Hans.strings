@@ -29,8 +29,6 @@
 "screenshots" = "在截图中显示";
 "performance" = "最高性能";
 "login" = "登录时打开";
-"updates" = "检查更新…";
-"support" = "支持 Snowhush";
 "quit" = "退出";
 
 "clear.snow" = "清除积雪";
@@ -63,3 +61,35 @@
 "setup.open" = "打开 Snowhush";
 "setup.failed" = "无法安装：{error}。";
 "setup.retry" = "重试";
+
+/* Sound */
+"sound" = "声音";
+"sound.ambient" = "环境音";
+"sound.volume" = "音量";
+"sound.music" = "你的音乐";
+"sound.music.choose" = "选择音乐文件夹…";
+"sound.music.folder" = "音乐：";
+"sound.music.stop" = "停止音乐";
+"sound.music.next" = "下一首";
+"sound.music.empty" = "该文件夹中没有 Snowhush 可以播放的音乐。";
+"sound.music.prompt" = "选择一个音乐文件夹，在环境音下轻声播放。";
+"sound.custom" = "使用自己的声音…";
+"sound.credits" = "声音来源";
+
+/* Presets and sleep timer */
+"presets" = "预设";
+"preset.winter" = "深冬";
+"preset.autumn" = "秋日傍晚";
+"preset.rain" = "温馨雨天";
+"preset.spring" = "春日清晨";
+"preset.focus" = "专注";
+"preset.save" = "将当前存储为预设…";
+"preset.save.title" = "存储预设";
+"preset.save.prompt" = "将存储模式、强度和音量；选择预设会打开声音。";
+"preset.name" = "预设名称";
+"preset.delete" = "删除“%@”";
+"save" = "存储";
+"cancel" = "取消";
+"sleep" = "睡眠定时器";
+"sleep.off" = "关闭";
+"sleep.left" = "剩余 %@";

@@ -29,8 +29,6 @@
 "screenshots" = "Afficher dans les captures";
 "performance" = "Performances maximales";
 "login" = "Ouvrir à la connexion";
-"updates" = "Rechercher les mises à jour…";
-"support" = "Soutenir Snowhush";
 "quit" = "Quitter";
 
 "clear.snow" = "Effacer la neige";
@@ -63,3 +61,35 @@
 "setup.open" = "Ouvrir Snowhush";
 "setup.failed" = "Installation impossible : {error}.";
 "setup.retry" = "Réessayer";
+
+/* Sound */
+"sound" = "Son";
+"sound.ambient" = "Ambiance sonore";
+"sound.volume" = "Volume";
+"sound.music" = "Votre musique";
+"sound.music.choose" = "Choisir un dossier de musique…";
+"sound.music.folder" = "Musique :";
+"sound.music.stop" = "Arrêter la musique";
+"sound.music.next" = "Morceau suivant";
+"sound.music.empty" = "Ce dossier ne contient aucune musique que Snowhush peut lire.";
+"sound.music.prompt" = "Choisissez un dossier de musique à jouer doucement sous l’ambiance.";
+"sound.custom" = "Vos propres sons…";
+"sound.credits" = "Crédits sonores";
+
+/* Presets and sleep timer */
+"presets" = "Préréglages";
+"preset.winter" = "Hiver profond";
+"preset.autumn" = "Soir d’automne";
+"preset.rain" = "Pluie douillette";
+"preset.spring" = "Matin de printemps";
+"preset.focus" = "Concentration";
+"preset.save" = "Enregistrer l’actuel comme préréglage…";
+"preset.save.title" = "Enregistrer le préréglage";
+"preset.save.prompt" = "Le mode, l’intensité et le volume sont enregistrés ; le préréglage active le son.";
+"preset.name" = "Nom du préréglage";
+"preset.delete" = "Supprimer « %@ »";
+"save" = "Enregistrer";
+"cancel" = "Annuler";
+"sleep" = "Minuterie de sommeil";
+"sleep.off" = "Désactivée";
+"sleep.left" = "Encore %@";

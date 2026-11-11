@@ -19,6 +19,8 @@ vtool -set-build-version macos "$minimum" "$(xcrun --sdk macosx --show-sdk-versi
 ditto "$products/Sparkle.framework" "$app/Contents/Frameworks/Sparkle.framework"
 cp Resources/Info.plist "$app/Contents/"
 cp Resources/AppIcon.icns "$app/Contents/Resources/"
+# The ambient sounds, and their credits: see SOUNDS.md.
+[[ -d Resources/Sounds ]] && ditto Resources/Sounds "$app/Contents/Resources/Sounds"
 for strings in locales/*.strings; do
     lproj="$app/Contents/Resources/$(basename "$strings" .strings).lproj"
     mkdir -p "$lproj"
